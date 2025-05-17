@@ -1,4 +1,2 @@
 telebot
 requests
-time
-datetime
