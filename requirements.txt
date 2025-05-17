@@ -1,5 +1,5 @@
 telebot
 requests
-os
+
 time
 datetime
