@@ -1,6 +1,5 @@
 telebot
 requests
-json
 os
 time
 datetime
