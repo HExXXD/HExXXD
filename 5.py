@@ -2,6 +2,8 @@ import telebot
 import requests
 import json
 import os
+import socket
+import threading
 import time
 from datetime import datetime
 
@@ -26,7 +28,9 @@ def handle_start(msg):
     markup.add(
         telebot.types.InlineKeyboardButton('📱 إرسال رقم الهاتف 📱', callback_data='send_number')
     )
-    bot.send_message(chat_id, '''👋 مرحبًا! بك في بوت الذي سيقدم لك مساعدة في تفعيل العروض في الشرائح التالية: 
+    
+    try:
+        bot.send_message(chat_id, '''👋 مرحبًا! بك في بوت الذي سيقدم لك مساعدة في تفعيل العروض في الشرائح التالية: 
 
 جيزي-Djezzy(متوفر حاليا✅)
 اوريدو-Ooredoo(سيتم توفيره عما قريب🕑) 
@@ -37,6 +41,12 @@ def handle_start(msg):
 و نتمنى حسن استعمال البوت و نحن دائما تحت الخدمة💗
 
 لاستعمال البوت اظغط الزر👇''', reply_markup=markup)
+        
+    except telebot.apihelper.ApiTelegramException as e:
+        if e.error_code == 403:
+            print(f"المستخدم {chat_id} حظر البوت - تجاهل الرسالة.")
+        else:
+            print(f"خطأ غير متوقع مع {chat_id}: {e}")
 
 @bot.callback_query_handler(func=lambda call: call.data == 'send_number')
 def handle_send_number(call):
@@ -473,6 +483,19 @@ def verify_otp(msisdn, otp):
    
 
 
+
+def fake_web_server():
+    port = int(os.environ.get("PORT", 10000))  # أي رقم آمن وهمي
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('0.0.0.0', port))
+    s.listen(1)
+    print(f"Fake server running on port {port}")
+    while True:
+        conn, addr = s.accept()
+        conn.close()
+
+# تشغيل الخادم الوهمي في خيط منفصل
+threading.Thread(target=fake_web_server, daemon=True).start()
 
 def run_bot():
     while True:
